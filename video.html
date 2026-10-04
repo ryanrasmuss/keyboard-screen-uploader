@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Keyboard Video Uploader</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header>
+        <h1>Keyboard Video Uploader</h1>
+        <p class="subtitle">Trim a video clip and push it straight to your keyboard's screen over WebHID.</p>
+        <p class="page-link"><a href="/index.html">&larr; Back to GIF uploader</a></p>
+      </header>
+
+      <details class="limits-panel">
+        <summary>GIF upload limits</summary>
+        <dl class="limits-grid">
+          <div>
+            <dt>Resolution</dt>
+            <dd id="limit-resolution"></dd>
+          </div>
+          <div>
+            <dt>Max frames</dt>
+            <dd id="limit-frames"></dd>
+          </div>
+          <div>
+            <dt>Frame delay</dt>
+            <dd id="limit-delay"></dd>
+          </div>
+          <div>
+            <dt>Color depth</dt>
+            <dd>65,536 colors (RGB565)</dd>
+          </div>
+          <div>
+            <dt>Max payload</dt>
+            <dd id="limit-payload"></dd>
+          </div>
+          <div>
+            <dt>Source format</dt>
+            <dd>Video (trimmed to frames)</dd>
+          </div>
+        </dl>
+        <ul class="limits-tips">
+          <li>Only the trimmed range is captured — the rest of the video is never decoded.</li>
+          <li>Frames are sampled at up to 20fps, then resampled to the device's frame budget below.</li>
+          <li>Smooth gradients can band slightly at this color depth — turn on dithering in the optimize panel below to soften it.</li>
+          <li>Screen looks wrong right after an upload? Unplug and replug the keyboard — that's a known, harmless reset.</li>
+        </ul>
+      </details>
+
+      <section id="browser-warning" class="warning" hidden>
+        This browser doesn't support WebHID and/or video frame capture. Open this page in a
+        recent desktop Chrome or Edge.
+      </section>
+
+      <main>
+        <section class="panel">
+          <label class="file-drop" for="file-input">
+            <input id="file-input" type="file" accept="video/*" />
+            <span id="file-label">Choose a video&hellip;</span>
+          </label>
+
+          <div id="video-wrap" class="video-wrap" hidden>
+            <video id="video-el" controls muted playsinline></video>
+
+            <div class="trim-controls">
+              <div class="trim-field">
+                <label for="trim-start">Start (s)</label>
+                <input id="trim-start" type="number" min="0" step="0.1" value="0" />
+                <button id="trim-start-now" type="button" class="small-btn">Use current time</button>
+              </div>
+              <div class="trim-field">
+                <label for="trim-end">End (s)</label>
+                <input id="trim-end" type="number" min="0" step="0.1" value="0" />
+                <button id="trim-end-now" type="button" class="small-btn">Use current time</button>
+              </div>
+              <button id="use-range-btn" type="button">Use this range</button>
+            </div>
+          </div>
+
+          <div id="preview-wrap" class="preview-wrap" hidden>
+            <canvas id="preview-canvas"></canvas>
+            <div id="crop-box" class="crop-box">
+              <div class="crop-handle" data-handle="se"></div>
+            </div>
+          </div>
+
+          <p id="frame-info" class="frame-info"></p>
+        </section>
+
+        <section id="optimize-panel" class="panel optimize-panel" hidden>
+          <p class="panel-title">Optimize for the screen</p>
+
+          <label class="control-row">
+            <span class="control-label">Frames: <span id="frame-count-value" class="mono"></span></span>
+            <input id="frame-count-slider" type="range" min="1" max="1" value="1" />
+          </label>
+
+          <label class="control-row checkbox-row">
+            <input id="dither-toggle" type="checkbox" checked />
+            <span>Dither (reduces color banding)</span>
+          </label>
+
+          <div class="device-preview-wrap">
+            <p class="compare-label">On the screen</p>
+            <canvas id="device-preview-canvas"></canvas>
+          </div>
+        </section>
+
+        <section class="panel controls">
+          <button id="connect-btn" type="button">Connect keyboard</button>
+          <button id="upload-btn" type="button" disabled>Crop &amp; upload</button>
+          <div id="progress-wrap" class="progress-wrap" hidden>
+            <div id="progress-bar" class="progress-bar"></div>
+          </div>
+          <p id="status" class="status" aria-live="polite"></p>
+        </section>
+      </main>
+
+      <footer>
+        <p>
+          Target screen: <span id="screen-dims"></span> &middot; device
+          <span id="device-ids"></span>
+        </p>
+      </footer>
+    </div>
+    <script type="module" src="/src/video-main.ts"></script>
+  </body>
+</html>

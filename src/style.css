@@ -1,0 +1,365 @@
+:root {
+  color-scheme: dark light;
+  --bg: #111318;
+  --panel: #1b1e26;
+  --border: #2c303c;
+  --text: #e7e9ee;
+  --muted: #9aa0ad;
+  --accent: #5b8cff;
+  --error: #ff6b6b;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+#app {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 3rem;
+}
+
+header h1 {
+  margin-bottom: 0.25rem;
+  font-size: 1.5rem;
+}
+
+.subtitle {
+  color: var(--muted);
+  margin-top: 0;
+}
+
+.page-link {
+  margin: 0 0 1rem;
+}
+
+.page-link a {
+  color: var(--accent);
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.page-link a:hover {
+  text-decoration: underline;
+}
+
+.video-wrap {
+  margin-bottom: 1rem;
+}
+
+#video-el {
+  display: block;
+  width: 100%;
+  max-height: 360px;
+  background: #000;
+  border-radius: 8px;
+}
+
+.trim-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-top: 0.9rem;
+}
+
+.trim-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.trim-field label {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.trim-field input[type="number"] {
+  font: inherit;
+  width: 6rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.small-btn {
+  font-size: 0.78rem;
+  padding: 0.4rem 0.7rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.small-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.limits-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.6rem 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.limits-panel summary {
+  cursor: pointer;
+  padding: 0.5rem 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+  list-style: none;
+}
+
+.limits-panel summary::-webkit-details-marker {
+  display: none;
+}
+
+.limits-panel summary::before {
+  content: "▸";
+  display: inline-block;
+  margin-right: 0.5rem;
+  color: var(--accent);
+}
+
+.limits-panel[open] summary::before {
+  content: "▾";
+}
+
+.limits-panel summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.limits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  gap: 0.9rem;
+  margin: 0.5rem 0 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+.limits-grid dt {
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.limits-grid dd {
+  margin: 0.2rem 0 0;
+  font-size: 1.05rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.limits-tips {
+  margin: 0 0 0.75rem;
+  padding-left: 1.1rem;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.limits-tips li {
+  margin-bottom: 0.4rem;
+}
+
+.warning {
+  background: #3a2323;
+  border: 1px solid #6b3333;
+  color: #ffb3b3;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.file-drop {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: 1.25rem;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.file-drop input {
+  display: none;
+}
+
+.preview-wrap {
+  position: relative;
+  margin: 1.25rem auto 0;
+  touch-action: none;
+}
+
+#preview-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  border-radius: 4px;
+}
+
+.crop-box {
+  position: absolute;
+  border: 2px solid var(--accent);
+  background: rgba(91, 140, 255, 0.12);
+  cursor: move;
+  touch-action: none;
+}
+
+.crop-handle {
+  position: absolute;
+  right: -7px;
+  bottom: -7px;
+  width: 14px;
+  height: 14px;
+  background: var(--accent);
+  border-radius: 50%;
+  cursor: se-resize;
+  touch-action: none;
+}
+
+.frame-info {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin: 0.75rem 0 0;
+  text-align: center;
+}
+
+.mono {
+  font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Consolas, monospace;
+}
+
+.panel-title {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.optimize-panel .control-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+}
+
+.optimize-panel .control-label {
+  color: var(--muted);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.optimize-panel input[type="range"] {
+  flex: 1;
+  accent-color: var(--accent);
+}
+
+.optimize-panel .checkbox-row {
+  justify-content: flex-start;
+  gap: 0.6rem;
+}
+
+.optimize-panel .checkbox-row input {
+  accent-color: var(--accent);
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.compare-label {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin: 0 0 0.4rem;
+  text-align: center;
+}
+
+.device-preview-wrap {
+  margin-top: 1.1rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--border);
+}
+
+#device-preview-canvas {
+  display: block;
+  margin: 0 auto;
+  background: #000;
+  border-radius: 4px;
+  image-rendering: pixelated;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+button {
+  font: inherit;
+  padding: 0.6rem 1.1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--accent);
+  color: white;
+  cursor: pointer;
+}
+
+button:disabled {
+  background: #333844;
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+.progress-wrap {
+  width: 100%;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0;
+  background: var(--accent);
+  transition: width 0.15s ease;
+}
+
+.status {
+  width: 100%;
+  margin: 0;
+  color: var(--muted);
+}
+
+.status-error {
+  color: var(--error);
+}
+
+footer {
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-align: center;
+}

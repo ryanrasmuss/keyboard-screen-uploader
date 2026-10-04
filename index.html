@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Keyboard GIF Uploader</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header>
+        <h1>Keyboard GIF Uploader</h1>
+        <p class="subtitle">Crop a GIF and push it straight to your keyboard's screen over WebHID.</p>
+        <p class="page-link"><a href="/video.html">Convert a video instead &rarr;</a></p>
+      </header>
+
+      <details class="limits-panel">
+        <summary>GIF upload limits</summary>
+        <dl class="limits-grid">
+          <div>
+            <dt>Resolution</dt>
+            <dd id="limit-resolution"></dd>
+          </div>
+          <div>
+            <dt>Max frames</dt>
+            <dd id="limit-frames"></dd>
+          </div>
+          <div>
+            <dt>Frame delay</dt>
+            <dd id="limit-delay"></dd>
+          </div>
+          <div>
+            <dt>Color depth</dt>
+            <dd>65,536 colors (RGB565)</dd>
+          </div>
+          <div>
+            <dt>Max payload</dt>
+            <dd id="limit-payload"></dd>
+          </div>
+          <div>
+            <dt>Source format</dt>
+            <dd>GIF</dd>
+          </div>
+        </dl>
+        <ul class="limits-tips">
+          <li>File size on disk doesn't matter — only frame count and the fixed resolution above do.</li>
+          <li>Fewer, longer-held frames often read better than many rapid ones within the frame budget.</li>
+          <li>Smooth gradients can band slightly at this color depth — turn on dithering in the optimize panel below to soften it.</li>
+          <li>Screen looks wrong right after an upload? Unplug and replug the keyboard — that's a known, harmless reset.</li>
+        </ul>
+      </details>
+
+      <section id="browser-warning" class="warning" hidden>
+        This browser doesn't support WebHID and/or WebCodecs. Open this page in a recent
+        desktop Chrome or Edge.
+      </section>
+
+      <main>
+        <section class="panel">
+          <label class="file-drop" for="file-input">
+            <input id="file-input" type="file" accept="image/gif" />
+            <span id="file-label">Choose a GIF&hellip;</span>
+          </label>
+
+          <div id="preview-wrap" class="preview-wrap" hidden>
+            <canvas id="preview-canvas"></canvas>
+            <div id="crop-box" class="crop-box">
+              <div class="crop-handle" data-handle="se"></div>
+            </div>
+          </div>
+
+          <p id="frame-info" class="frame-info"></p>
+        </section>
+
+        <section id="optimize-panel" class="panel optimize-panel" hidden>
+          <p class="panel-title">Optimize for the screen</p>
+
+          <label class="control-row">
+            <span class="control-label">Frames: <span id="frame-count-value" class="mono"></span></span>
+            <input id="frame-count-slider" type="range" min="1" max="1" value="1" />
+          </label>
+
+          <label class="control-row checkbox-row">
+            <input id="dither-toggle" type="checkbox" checked />
+            <span>Dither (reduces color banding)</span>
+          </label>
+
+          <div class="device-preview-wrap">
+            <p class="compare-label">On the screen</p>
+            <canvas id="device-preview-canvas"></canvas>
+          </div>
+        </section>
+
+        <section class="panel controls">
+          <button id="connect-btn" type="button">Connect keyboard</button>
+          <button id="upload-btn" type="button" disabled>Crop &amp; upload</button>
+          <div id="progress-wrap" class="progress-wrap" hidden>
+            <div id="progress-bar" class="progress-bar"></div>
+          </div>
+          <p id="status" class="status" aria-live="polite"></p>
+        </section>
+      </main>
+
+      <footer>
+        <p>
+          Target screen: <span id="screen-dims"></span> &middot; device
+          <span id="device-ids"></span>
+        </p>
+      </footer>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

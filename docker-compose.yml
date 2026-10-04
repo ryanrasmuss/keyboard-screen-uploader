@@ -1,0 +1,5 @@
+services:
+  keyboard-screen-uploader:
+    build: .
+    ports:
+      - "8080:80"
