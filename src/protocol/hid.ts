@@ -113,23 +113,55 @@ export class KeyboardScreen {
     onStatus?.({ kind: "connected" });
   }
 
-  /** Syncs the device's real-time clock. Packet layout reverse-engineered from the original site's handshake. */
+  /**
+   * Syncs the device's real-time clock. Four feature reports, each acked:
+   * begin (0x04 0x18) → set-time op (0x04 0x28, byte 8 = 1) → the time data
+   * itself → save (0x04 0x02). Sequence from d991d/ajazz-control's
+   * hardware-confirmed docs/PROTOCOL.md for a sibling Sonix keyboard, and
+   * verified on a real PLAY75. Sending only the time-data packet, as the
+   * original site's bundle appeared to, is rejected by the device.
+   */
   private async timeSync(): Promise<void> {
     if (!this.controlDevice) throw new Error("Not connected.");
+    const controlDevice = this.controlDevice;
+    const command = async (packet: Uint8Array) => {
+      await controlDevice.sendFeatureReport(0, packet);
+      await controlDevice.receiveFeatureReport(0);
+    };
+
     const now = new Date();
-    const packet = new Uint8Array(64);
-    packet[0] = 0;
-    packet[1] = 1;
-    packet[2] = 0x5a;
-    packet[3] = Number(now.getFullYear().toString().slice(-2));
-    packet[4] = now.getMonth() + 1;
-    packet[5] = now.getDate();
-    packet[6] = now.getHours();
-    packet[7] = now.getMinutes();
-    packet[8] = now.getSeconds();
-    packet[10] = now.getDay();
-    packet[62] = 0xaa;
-    await this.controlDevice.sendFeatureReport(0, packet);
+    const beginPacket = new Uint8Array(64);
+    beginPacket[0] = 4;
+    beginPacket[1] = 24;
+
+    const opPacket = new Uint8Array(64);
+    opPacket[0] = 4;
+    opPacket[1] = 40;
+    opPacket[8] = 1;
+
+    // 0x00 0x01 0x5A — 0x5A is the firmware's time-data discriminator, which
+    // is why this packet doesn't start with the usual 0x04.
+    const timePacket = new Uint8Array(64);
+    timePacket[1] = 1;
+    timePacket[2] = 0x5a;
+    timePacket[3] = now.getFullYear() % 100;
+    timePacket[4] = now.getMonth() + 1;
+    timePacket[5] = now.getDate();
+    timePacket[6] = now.getHours();
+    timePacket[7] = now.getMinutes();
+    timePacket[8] = now.getSeconds();
+    timePacket[10] = now.getDay();
+    timePacket[62] = 0xaa;
+    timePacket[63] = 0x55;
+
+    const savePacket = new Uint8Array(64);
+    savePacket[0] = 4;
+    savePacket[1] = 2;
+
+    await command(beginPacket);
+    await command(opPacket);
+    await command(timePacket);
+    await command(savePacket);
   }
 
   async uploadPayload(chunks: Uint8Array[], onStatus?: StatusListener): Promise<void> {

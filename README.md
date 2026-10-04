@@ -126,8 +126,12 @@ If an upload ever looks wrong on-screen: unplug, replug, try again.
   collections matter: a control channel (`usagePage 0xFF13, usage 1`) and a
   bulk data channel (`usagePage 0xFF68, usage 0x61`) — confirmed against a
   real Play75 unit; see `src/config.ts`.
-- **Handshake**: on connect, a 64-byte feature report syncs the device's
-  clock.
+- **Handshake**: on connect, four 64-byte feature reports sync the device's
+  clock, each acked: `0x04 0x18` (begin) → `0x04 0x28` with byte 8 = `0x01`
+  (set-time op) → `0x00 0x01 0x5A yy mm dd hh mm ss 0x00 dow`, with
+  `0xAA 0x55` in bytes 62–63 (time data) → `0x04 0x02` (save). Taken from
+  d991d/ajazz-control's hardware-confirmed protocol notes and verified on a
+  real PLAY75. The time-data packet alone is rejected.
 - **Transfer**: `0x04 0x18` (start) → ack → `0x04 0x72 0x02` + chunk count
   (little-endian, bytes 8–9) → ack → stream data chunks (each acked via
   `oninputreport` before the next is sent) → `0x04 0x02` (end) → ack. The end
@@ -145,8 +149,8 @@ exceptions are the RGB565 byte order and the delay-tick unit, both
 cross-checked against d991d/ajazz-control's hardware-confirmed
 implementation for a sibling device. If a real upload still behaves oddly
 (device doesn't respond, wrong colors, wrong timing), the likely suspect is
-the time-sync handshake's exact trigger point — see `src/protocol/hid.ts`
-and `src/protocol/payload.ts`.
+the transfer sequence — see `src/protocol/hid.ts` and
+`src/protocol/payload.ts`.
 
 Device/screen constants live in one place — `src/config.ts` — if you ever
 need to point this at a different keyboard.
