@@ -2,6 +2,7 @@ import { browserSupportsVideoDecode, decodeVideo } from "./video/decode";
 import { browserSupportsHid } from "./protocol/hid";
 import { createUploadFlow } from "./ui/upload-flow";
 import { populateLimitsPanel } from "./ui/limits-panel";
+import { isLinux, renderLinuxPanel } from "./ui/linux-panel";
 import "./style.css";
 
 function byId<T extends HTMLElement>(id: string): T {
@@ -46,6 +47,7 @@ const flow = createUploadFlow({
   progressWrap: byId("progress-wrap"),
   progressBar: byId("progress-bar"),
   statusEl: byId("status"),
+  linuxPanel: renderLinuxPanel(byId("linux-panel")),
 });
 
 let currentFile: File | null = null;
@@ -93,7 +95,7 @@ useRangeBtn.addEventListener("click", async () => {
   flow.setStatus("Capturing frames from the trimmed range…");
   try {
     const gif = await decodeVideo(currentFile, { startSec, endSec });
-    flow.setDecoded(gif);
+    flow.setDecoded(gif, currentFile.name);
   } catch (error) {
     flow.setStatus(error instanceof Error ? error.message : String(error), true);
   } finally {
@@ -106,7 +108,8 @@ fileInput.addEventListener("change", () => {
   if (file) handleFileSelected(file);
 });
 
-const supported = browserSupportsVideoDecode() && browserSupportsHid();
+// On Linux the .bin export replaces WebHID, so only decoding is required there.
+const supported = browserSupportsVideoDecode() && (browserSupportsHid() || isLinux());
 browserWarning.hidden = supported;
 fileInput.disabled = !supported;
 flow.setStatus(supported ? "Choose a video to get started." : "Unsupported browser.");

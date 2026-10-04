@@ -1,4 +1,5 @@
 import { config } from "../config";
+import { isLinux } from "../ui/linux-panel";
 
 export type UploadStatus =
   | { kind: "connecting" }
@@ -84,6 +85,12 @@ export class KeyboardScreen {
           dataDevice = device;
         }
       }
+    }
+    if (dataDevice && !controlDevice && isLinux()) {
+      throw new Error(
+        "Linux doesn't let the browser reach the screen's control channel. " +
+          "Use the “On Linux?” panel below to upload with a small script instead.",
+      );
     }
     if (!controlDevice || !dataDevice) {
       const found = describeDevices(devices);

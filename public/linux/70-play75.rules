@@ -1,0 +1,7 @@
+# Osume PLAY75 screen controller (USB 0c45:800b): give the logged-in user
+# access so play75-upload.py can upload without sudo.
+#   - the raw USB device, for the control channel (interface 3)
+#   - its hidraw nodes, for the data channel (interface 2)
+# Keep the file name below 73-, where systemd applies the uaccess tag.
+SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ATTR{idVendor}=="0c45", ATTR{idProduct}=="800b", TAG+="uaccess"
+KERNEL=="hidraw*", ATTRS{idVendor}=="0c45", ATTRS{idProduct}=="800b", TAG+="uaccess"

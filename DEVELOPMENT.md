@@ -52,6 +52,14 @@ Docker only serves the static files; it never touches the keyboard directly.
    crop/optimize/upload flow (`src/ui/upload-flow.ts`) works unchanged
    regardless of source. No video/GIF encoder needed anywhere — this app
    never produces a real `.gif` file, only the device's raw pixel format.
+7. **The Linux workflow** (`src/ui/linux-panel.ts`, `public/linux/`). On
+   Linux the kernel won't bind the screen's control interface, so WebHID
+   can't reach it. Both pages get an "On Linux?" panel that exports the
+   exact payload as a `.bin`, and `play75-upload.py` (stdlib only) uploads
+   it, sending control commands over usbfs and data over hidraw. The GIF
+   page was also switched to the shared `src/ui/upload-flow.ts` (it still
+   had its own copy), so the export exists in one place. See README's
+   Linux setup.
 
 Full protocol details, the exact device constants, and known open questions
 (e.g. whether uploads target a specific screen slot) are documented in

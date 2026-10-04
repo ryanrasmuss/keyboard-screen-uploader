@@ -10,7 +10,7 @@ import { config } from "../config";
  * 0xFF is reserved as the padding sentinel, so a real delay must never be
  * written as 0xFF — see config.maxDelayTicks.
  */
-export function buildPayload(frameBytes: Uint8Array[], delayTicks: number[]): Uint8Array {
+export function buildPayload(frameBytes: Uint8Array[], delayTicks: number[]): Uint8Array<ArrayBuffer> {
   if (frameBytes.length === 0) {
     throw new Error("No frames to upload.");
   }
